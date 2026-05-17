@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Panel — YOURU Community</title>
+  <link rel="icon" href="asset/youru.png">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="admin.css" />
+  <script>
+    // Apply dark mode before page renders to avoid flash
+    (function(){
+      if(localStorage.getItem('youru_theme')==='dark')
+        document.documentElement.setAttribute('data-theme','dark');
+    })();
+  </script>
+</head>
+<body>
+
+<!-- Mobile sidebar toggle -->
+<button class="sidebar-toggle-btn" id="sidebarToggle" onclick="toggleSidebar()"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><rect y="2" width="16" height="1.5" rx="0.75" fill="currentColor"/><rect y="7" width="16" height="1.5" rx="0.75" fill="currentColor"/><rect y="12" width="16" height="1.5" rx="0.75" fill="currentColor"/></svg></button>
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+<!-- Custom Confirm Modal -->
+<div class="modal-overlay" id="confirmModal">
+  <div class="modal-box">
+    <div class="modal-icon-ring" id="modalIconRing"><svg width="28" height="28" viewBox="0 0 16 16" fill="none"><polyline points="2,4 14,4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M5 4V2.5A0.5 0.5 0 015.5 2h5a0.5 0.5 0 01.5.5V4" stroke="currentColor" stroke-width="1.3"/><path d="M3 4l1 10.5A0.5 0.5 0 004.5 15h7a0.5 0.5 0 00.5-.5L13 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><line x1="6.5" y1="7" x2="6.5" y2="12" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><line x1="9.5" y1="7" x2="9.5" y2="12" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></div>
+    <div class="modal-title" id="modalTitle">Hapus item ini?</div>
+    <div class="modal-msg" id="modalMsg">Tindakan ini tidak bisa dibatalkan.</div>
+    <div class="modal-btns">
+      <button class="modal-btn-cancel" onclick="closeModal()">Batalkan</button>
+      <button class="modal-btn-confirm" id="modalConfirmBtn">Ya, Hapus</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ LOGIN SCREEN ══════════ -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo">YOURU <span>Community</span></div>
+    <div class="login-subtitle"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="margin-right:5px;vertical-align:-2px"><rect x="3" y="7" width="10" height="8" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M5 7V5a3 3 0 016 0v2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><circle cx="8" cy="11" r="1.2" fill="currentColor"/></svg> Admin Panel</div>
+    <h2>Masuk sebagai Pengurus</h2>
+    <p>Hanya pengurus yang berwenang dapat mengakses halaman ini.</p>
+    <div class="form-group">
+      <label>Username</label>
+      <input type="text" id="loginUser" placeholder="Masukkan username" />
+    </div>
+    <div class="form-group">
+      <label>Password</label>
+      <input type="password" id="loginPass" placeholder="Masukkan password" onkeydown="if(event.key==='Enter') doLogin()" />
+    </div>
+    <button class="btn-login" onclick="doLogin()">Masuk ke Admin Panel</button>
+    <div class="login-error" id="loginError"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" style="margin-right:5px;vertical-align:-2px;flex-shrink:0"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.4"/><path d="M5.5 5.5l5 5M10.5 5.5l-5 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg> Username atau password salah.</div>
+  </div>
+</div>
+
+<!-- ══════════ ADMIN PANEL ══════════ -->
+<div id="adminPanel">
+  <div class="admin-layout">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-logo">YOURU <span>Admin</span><br/><span class="sidebar-badge">PENGURUS</span></div>
+      <nav class="sidebar-nav">
+        <div class="sidebar-section-label">Dashboard</div>
+        <div class="sidebar-item active" onclick="switchTab('overview')" id="tab-overview">
+          <span class="icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="8" width="3" height="7" rx="0.75" fill="currentColor"/><rect x="6" y="5" width="3" height="10" rx="0.75" fill="currentColor"/><rect x="11" y="2" width="3" height="13" rx="0.75" fill="currentColor"/></svg></span> Overview
+        </div>
+        <div class="sidebar-section-label">Kelola Konten</div>
+        <div class="sidebar-item" onclick="switchTab('members')" id="tab-members">
+          <span class="icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="6" cy="5" r="2.5" stroke="currentColor" stroke-width="1.5"/><path d="M1 14c0-2.76 2.24-5 5-5s5 2.24 5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="12" cy="5" r="2" stroke="currentColor" stroke-width="1.3"/><path d="M14 13c0-2-1.34-3.7-3.2-4.2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></span> Anggota
+        </div>
+        <div class="sidebar-item" onclick="switchTab('spotlight')" id="tab-spotlight">
+          <span class="icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1l1.85 3.75L14 5.5l-3 2.92.71 4.13L8 10.4l-3.71 2.15L5 8.42 2 5.5l4.15-.75L8 1z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg></span> Spotlight
+        </div>
+        <div class="sidebar-item" onclick="switchTab('events')" id="tab-events">
+          <span class="icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1.5" y="2.5" width="13" height="12" rx="1.5" stroke="currentColor" stroke-width="1.4"/><line x1="1.5" y1="6.5" x2="14.5" y2="6.5" stroke="currentColor" stroke-width="1.4"/><line x1="5" y1="1" x2="5" y2="4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><line x1="11" y1="1" x2="11" y2="4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><circle cx="5.5" cy="10" r="0.9" fill="currentColor"/><circle cx="8.5" cy="10" r="0.9" fill="currentColor"/><circle cx="11.5" cy="10" r="0.9" fill="currentColor"/></svg></span> Events
+        </div>
+        <div class="sidebar-item" onclick="switchTab('instagram')" id="tab-instagram">
+          <span class="icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1.5" y="4" width="13" height="10" rx="1.5" stroke="currentColor" stroke-width="1.4"/><circle cx="8" cy="9" r="2.5" stroke="currentColor" stroke-width="1.4"/><path d="M5.5 4l1-2h3l1 2" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><circle cx="12.5" cy="6.5" r="0.8" fill="currentColor"/></svg></span> Postingan Instagram
+        </div>
+        <div class="sidebar-item" onclick="switchTab('pengurus')" id="tab-pengurus">
+          <span class="icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1L15 5H1L8 1z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><rect x="2.5" y="5" width="1.5" height="8" fill="currentColor" rx="0.5"/><rect x="7.25" y="5" width="1.5" height="8" fill="currentColor" rx="0.5"/><rect x="12" y="5" width="1.5" height="8" fill="currentColor" rx="0.5"/><rect x="1" y="13" width="14" height="1.5" rx="0.5" fill="currentColor"/></svg></span> Pengurus
+        </div>
+        <div class="sidebar-section-label">Pengaturan</div>
+        <div class="sidebar-item" onclick="switchTab('settings')" id="tab-settings">
+          <span class="icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="2.2" stroke="currentColor" stroke-width="1.4"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3.05 3.05l1.41 1.41M11.54 11.54l1.41 1.41M3.05 12.95l1.41-1.41M11.54 4.46l1.41-1.41" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></span> Pengaturan
+        </div>
+      </nav>
+      <div class="sidebar-footer">
+        <a href="index.html" target="_blank" class="btn-view-site"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="margin-right:6px;vertical-align:-2px"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.4"/><ellipse cx="8" cy="8" rx="2.5" ry="6.5" stroke="currentColor" stroke-width="1.2"/><line x1="1.5" y1="5.5" x2="14.5" y2="5.5" stroke="currentColor" stroke-width="1.2"/><line x1="1.5" y1="10.5" x2="14.5" y2="10.5" stroke="currentColor" stroke-width="1.2"/></svg> Lihat Website</a>
+        <button class="btn-darkmode" id="darkModeBtn" onclick="toggleDarkMode()"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="margin-right:6px;vertical-align:-2px"><path d="M13.5 10.5A6 6 0 015.5 2.5a6 6 0 108 8z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg> Mode Malam</button>
+        <button class="btn-logout" onclick="doLogout()"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="margin-right:6px;vertical-align:-2px"><path d="M6 2H2.5A1.5 1.5 0 001 3.5v9A1.5 1.5 0 002.5 14H6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M10 11l3-3-3-3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><line x1="7" y1="8" x2="13" y2="8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg> Keluar</button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="admin-main">
+
+      <!-- ── OVERVIEW ── -->
+      <div class="tab-content active" id="content-overview">
+        <div class="admin-topbar">
+          <div>
+            <h1><svg width="20" height="20" viewBox="0 0 16 16" fill="none" style="margin-right:8px;vertical-align:-4px"><rect x="1" y="8" width="3" height="7" rx="0.75" fill="currentColor"/><rect x="6" y="5" width="3" height="10" rx="0.75" fill="currentColor"/><rect x="11" y="2" width="3" height="13" rx="0.75" fill="currentColor"/></svg> Overview</h1>
+            <p>Selamat datang di panel admin YOURU Community</p>
+          </div>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-card"><div class="num" id="statMembers">0</div><div class="lbl">Total Anggota</div></div>
+          <div class="stat-card"><div class="num" id="statSpotlight">0</div><div class="lbl">Spotlight Aktif</div></div>
+          <div class="stat-card"><div class="num" id="statEvents">0</div><div class="lbl">Event Terdaftar</div></div>
+          <div class="stat-card"><div class="num" id="statPosts">0</div><div class="lbl">Postingan IG</div></div>
+        </div>
+        <div class="admin-card">
+          <h3><svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="margin-right:6px;vertical-align:-3px"><polyline points="1,12 5,7 8,9 12,4 15,6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg> Edit Statistik Hero</h3>
+          <p style="font-size:0.82rem;color:var(--text-mid);margin-bottom:18px;">Angka-angka ini tampil di bagian atas halaman utama website. Kamu bisa menggunakan format seperti <code>120+</code> atau <code>2K</code>.</p>
+          <div class="stat-editor-grid">
+
+            <div class="stat-editor-item">
+              <div class="stat-editor-preview" id="prev0">120+</div>
+              <div class="stat-editor-label-preview" id="prevL0">Member Aktif</div>
+              <div class="form-group" style="margin-bottom:8px;">
+                <label>Angka</label>
+                <input type="text" id="hsVal0" placeholder="contoh: 120+" maxlength="10">
+              </div>
+              <div class="form-group" style="margin-bottom:0;">
+                <label>Label</label>
+                <input type="text" id="hsLbl0" placeholder="contoh: Member Aktif" maxlength="30">
+              </div>
+            </div>
+
+            <div class="stat-editor-item">
+              <div class="stat-editor-preview" id="prev1">48</div>
+              <div class="stat-editor-label-preview" id="prevL1">Karya Bulan Ini</div>
+              <div class="form-group" style="margin-bottom:8px;">
+                <label>Angka</label>
+                <input type="text" id="hsVal1" placeholder="contoh: 48" maxlength="10">
+              </div>
+              <div class="form-group" style="margin-bottom:0;">
+                <label>Label</label>
+                <input type="text" id="hsLbl1" placeholder="contoh: Karya Bulan Ini" maxlength="30">
+              </div>
+            </div>
+
+            <div class="stat-editor-item">
+              <div class="stat-editor-preview" id="prev2">12</div>
+              <div class="stat-editor-label-preview" id="prevL2">Event Tahunan</div>
+              <div class="form-group" style="margin-bottom:8px;">
+                <label>Angka</label>
+                <input type="text" id="hsVal2" placeholder="contoh: 12" maxlength="10">
+              </div>
+              <div class="form-group" style="margin-bottom:0;">
+                <label>Label</label>
+                <input type="text" id="hsLbl2" placeholder="contoh: Event Tahunan" maxlength="30">
+              </div>
+            </div>
+
+          </div>
+          <div style="margin-top:20px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+            <button class="btn-add" onclick="saveHeroStats()"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="margin-right:6px;vertical-align:-2px"><rect x="1.5" y="1.5" width="13" height="13" rx="1.5" stroke="currentColor" stroke-width="1.4"/><rect x="4" y="1.5" width="8" height="5" rx="0.5" stroke="currentColor" stroke-width="1.2"/><rect x="3.5" y="9" width="9" height="4.5" rx="0.5" stroke="currentColor" stroke-width="1.2"/></svg> Simpan Perubahan</button>
+            <button onclick="resetHeroStats()" style="padding:12px 18px;background:var(--off-white);color:var(--text-mid);font-family:'Plus Jakarta Sans',sans-serif;font-size:0.82rem;font-weight:700;border:1.5px solid var(--border);border-radius:10px;cursor:pointer;"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="margin-right:6px;vertical-align:-2px"><path d="M2 8a6 6 0 106-6H6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><polyline points="3,4 6,7 3,10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" transform="rotate(180,4.5,7)"/></svg> Reset ke Default</button>
+          </div>
+        </div>
+        <div class="admin-card">
+          <h3><svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="margin-right:6px;vertical-align:-3px"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.4"/><line x1="8" y1="7" x2="8" y2="12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="8" cy="4.5" r="0.9" fill="currentColor"/></svg> Panduan Singkat</h3>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <div style="display:flex;gap:12px;align-items:flex-start;padding:12px;background:var(--blue-50);border-radius:10px;">
+              <span style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;flex-shrink:0;"><svg width="20" height="20" viewBox="0 0 16 16" fill="none"><circle cx="6" cy="5" r="2.5" stroke="var(--blue-500)" stroke-width="1.5"/><path d="M1 14c0-2.76 2.24-5 5-5s5 2.24 5 5" stroke="var(--blue-500)" stroke-width="1.5" stroke-linecap="round"/><circle cx="12" cy="5" r="2" stroke="var(--blue-500)" stroke-width="1.3"/><path d="M14 13c0-2-1.34-3.7-3.2-4.2" stroke="var(--blue-500)" stroke-width="1.3" stroke-linecap="round"/></svg></span>
+              <div><strong style="color:var(--navy);">Anggota</strong> — Tambah atau hapus daftar member komunitas.</div>
+            </div>
+            <div style="display:flex;gap:12px;align-items:flex-start;padding:12px;background:var(--blue-50);border-radius:10px;">
+              <span style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;flex-shrink:0;"><svg width="20" height="20" viewBox="0 0 16 16" fill="none"><path d="M8 1l1.85 3.75L14 5.5l-3 2.92.71 4.13L8 10.4l-3.71 2.15L5 8.42 2 5.5l4.15-.75L8 1z" stroke="var(--blue-500)" stroke-width="1.4" stroke-linejoin="round"/></svg></span>
+              <div><strong style="color:var(--navy);">Spotlight</strong> — Atur siapa yang tampil di bagian "Kreator Bersinar".</div>
+            </div>
+            <div style="display:flex;gap:12px;align-items:flex-start;padding:12px;background:var(--blue-50);border-radius:10px;">
+              <span style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;flex-shrink:0;"><svg width="20" height="20" viewBox="0 0 16 16" fill="none"><rect x="1.5" y="2.5" width="13" height="12" rx="1.5" stroke="var(--blue-500)" stroke-width="1.4"/><line x1="1.5" y1="6.5" x2="14.5" y2="6.5" stroke="var(--blue-500)" stroke-width="1.4"/><line x1="5" y1="1" x2="5" y2="4" stroke="var(--blue-500)" stroke-width="1.4" stroke-linecap="round"/><line x1="11" y1="1" x2="11" y2="4" stroke="var(--blue-500)" stroke-width="1.4" stroke-linecap="round"/></svg></span>
+              <div><strong style="color:var(--navy);">Events</strong> — Tambah, hapus, atau kelola event komunitas.</div>
+            </div>
+            <div style="display:flex;gap:12px;align-items:flex-start;padding:12px;background:var(--blue-50);border-radius:10px;">
+              <span style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;flex-shrink:0;"><svg width="20" height="20" viewBox="0 0 16 16" fill="none"><rect x="1.5" y="4" width="13" height="10" rx="1.5" stroke="var(--blue-500)" stroke-width="1.4"/><circle cx="8" cy="9" r="2.5" stroke="var(--blue-500)" stroke-width="1.4"/><path d="M5.5 4l1-2h3l1 2" stroke="var(--blue-500)" stroke-width="1.4" stroke-linejoin="round"/></svg></span>
+              <div><strong style="color:var(--navy);">Postingan Instagram</strong> — Tambah embed link postingan Instagram ke feed website.</div>
+            </div>
+            <div style="display:flex;gap:12px;align-items:flex-start;padding:12px;background:#fff3cd;border-radius:10px;border:1px solid #ffc107;">
+              <span style="display:flex;align-items:center;justify-content:center;width:28px;height:28px;flex-shrink:0;"><svg width="20" height="20" viewBox="0 0 16 16" fill="none"><path d="M8 1L15 14H1L8 1z" stroke="#856404" stroke-width="1.4" stroke-linejoin="round"/><line x1="8" y1="6" x2="8" y2="10" stroke="#856404" stroke-width="1.5" stroke-linecap="round"/><circle cx="8" cy="12.5" r="0.9" fill="#856404"/></svg></span>
+              <div><strong style="color:#856404;">Perhatian:</strong> Untuk foto avatar/banner anggota, file gambar tetap perlu disimpan di folder <code>asset/</code> di Netlify. Masukkan nama file yang sudah diupload.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── MEMBERS ── -->
+      <div class="tab-content" id="content-members">
+        <div class="admin-topbar">
+          <div><h1><svg width="20" height="20" viewBox="0 0 16 16" fill="none" style="margin-right:8px;vertical-align:-4px"><circle cx="6" cy="5" r="2.5" stroke="currentColor" stroke-width="1.5"/><path d="M1 14c0-2.76 2.24-5 5-5s5 2.24 5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="12" cy="5" r="2" stroke="currentColor" stroke-width="1.3"/><path d="M14 13c0-2-1.34-3.7-3.2-4.2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg> Kelola Anggota</h1><p>Tambah atau hapus daftar member komunitas</p></div>
+        </div>
+        <div class="admin-card">
+          <h3><svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="margin-right:6px;vertical-align:-3px"><circle cx="7" cy="6" r="3" stroke="currentColor" stroke-width="1.4"/><path d="M2 14c0-2.76 2.24-5 5-5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><line x1="12" y1="9" x2="12" y2="15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="9" y1="12" x2="15" y2="12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg> Tambah Anggota Baru</h3>
+          <div class="form-row">
+            <div class="form-group"><label>ID (2 huruf kapital)</label><input type="text" id="mId" placeholder="contoh: AB" maxlength="2" style="text-transform:uppercase"></div>
+            <div class="form-group"><label>Nama Tampil</label><input type="text" id="mName" placeholder="contoh: Arka Biyuu"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Role / Spesialisasi</label><input type="text" id="mRole" placeholder="contoh: GFX Designer & Motion"></div>
+            <div class="form-group">
+              <label>Status</label>
+              <select id="mTag">
+                <option value="Aktif">Aktif</option>
+                <option value="Tidak Aktif">Tidak Aktif</option>
+                <option value="Hiatus">Hiatus</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Username Instagram</label><input type="text" id="mIg" placeholder="contoh: @username (tanpa https://)"></div>
+            <div class="form-group"><label>Username TikTok</label><input type="text" id="mTt" placeholder="contoh: @username (tanpa https://)"></div>
+          </div>
+          <div class="form-group">
+            <label>Foto Avatar</label>
+            <div class="img-upload-area" onclick="document.getElementById('mAvatarFile').click()">
+              <input type="file" id="mAvatarFile" accept="image/*" onchange="previewImg(this,'mAvatarPreview','mAvatarData')">
+              <img id="mAvatarPreview" class="img-preview" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 80'%3E%3Ccircle cx='40' cy='40' r='40' fill='%23eef4ff'/%3E%3Ccircle cx='40' cy='30' r='14' fill='%237ab0ff'/%3E%3Cellipse cx='40' cy='65' rx='22' ry='16' fill='%237ab0ff'/%3E%3C/svg%3E" style="display:block;">
+              <div class="img-upload-label">Klik untuk upload foto</div>
+              <div class="img-upload-hint">JPG, PNG, max 2MB</div>
+            </div>
+            <input type="hidden" id="mAvatarData">
+          </div>
+          <button class="btn-add" onclick="addMember()"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" style="margin-right:6px;vertical-align:-1px"><line x1="8" y1="2" x2="8" y2="14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="2" y1="8" x2="14" y2="8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg> Tambah Anggota</button>
+        </div>
+        <div class="admin-card">
+          <h3><svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="margin-right:6px;vertical-align:-3px"><rect x="2.5" y="1.5" width="11" height="13" rx="1.5" stroke="currentColor" stroke-width="1.4"/><line x1="5" y1="5.5" x2="11" y2="5.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><line x1="5" y1="8" x2="11" y2="8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><line x1="5" y1="10.5" x2="8.5" y2="10.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg> Daftar Anggota</h3>
+          <div class="data-list" id="memberList"></div>
+        </div>
+      </div>
+
+      <!-- ── SPOTLIGHT ── -->
+      <div class="tab-content" id="content-spotlight">
+        <div class="admin-topbar">
+          <div><h1><svg width="20" height="20" viewBox="0 0 16 16" fill="none" style="margin-right:8px;vertical-align:-4px"><path d="M8 1l1.85 3.75L14 5.5l-3 2.92.71 4.13L8 10.4l-3.71 2.15L5 8.42 2 5.5l4.15-.75L8 1z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg> Kelola Spotlight</h1><p>Atur kreator yang tampil di bagian "Kreator Bersinar"</p></div>
+        </div>
+        <div class="admin-card">
+          <h3><svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="margin-right:6px;vertical-align:-3px"><path d="M8 1l1.85 3.75L14 5.5l-3 2.92.71 4.13L8 10.4l-3.71 2.15L5 8.42 2 5.5l4.15-.75L8 1z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><line x1="12" y1="12" x2="12" y2="16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="10" y1="14" x2="14" y2="14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg> Tambah Spotlight</h3>
+          <div class="form-row">
+            <div class="form-group"><label>ID (2 huruf kapital)</label><input type="text" id="sId" placeholder="contoh: YG" maxlength="2" style="text-transform:uppercase"></div>
+            <div class="form-group"><label>Nama</label><input type="text" id="sName" placeholder="contoh: Youthgraph Studio"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Tipe / Role</label><input type="text" id="sType" placeholder="contoh: Creative Designer"></div>
+            <div class="form-group"><label>Jabatan di Komunitas</label><input type="text" id="sTitle" placeholder="contoh: Community GFX Handler"></div>
+          </div>
+          <div class="form-group"><label>Deskripsi Singkat</label><textarea id="sDesc" placeholder="Deskripsi singkat tentang kreator ini..."></textarea></div>
+          <div class="form-row">
+            <div class="form-group"><label>Tags (pisahkan dengan koma)</label><input type="text" id="sTags" placeholder="contoh: Branding, Creative, Feed Design"></div>
+            <div class="form-group"><label>Link Instagram</label><input type="text" id="sLink" placeholder="https://instagram.com/username"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Foto Avatar</label>
+              <div class="img-upload-area" onclick="document.getElementById('sAvatarFile').click()">
+                <input type="file" id="sAvatarFile" accept="image/*" onchange="previewImg(this,'sAvatarPreview','sAvatarData')">
+                <img id="sAvatarPreview" class="img-preview" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 80'%3E%3Ccircle cx='40' cy='40' r='40' fill='%23eef4ff'/%3E%3Ccircle cx='40' cy='30' r='14' fill='%237ab0ff'/%3E%3Cellipse cx='40' cy='65' rx='22' ry='16' fill='%237ab0ff'/%3E%3C/svg%3E">
+                <div class="img-upload-label">Upload foto profil</div>
+                <div class="img-upload-hint">JPG, PNG, max 2MB</div>
+              </div>
+              <input type="hidden" id="sAvatarData">
+            </div>
+            <div class="form-group">
+              <label>Foto Background Banner</label>
+              <div class="img-upload-area" onclick="document.getElementById('sBgFile').click()" style="border-radius:10px;">
+                <input type="file" id="sBgFile" accept="image/*" onchange="previewImg(this,'sBgPreview','sBgData')">
+                <img id="sBgPreview" class="img-preview" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 80'%3E%3Crect width='160' height='80' fill='%23eef4ff'/%3E%3Crect x='20' y='25' width='120' height='30' rx='6' fill='%237ab0ff' opacity='.4'/%3E%3C/svg%3E" style="border-radius:8px;width:100%;height:60px;object-fit:cover;">
+                <div class="img-upload-label">Upload banner background</div>
+                <div class="img-upload-hint">JPG, PNG, max 3MB. Rasio 16:9 direkomendasikan</div>
+              </div>
+              <input type="hidden" id="sBgData">
+            </div>
+          </div>
+          <button class="btn-add" onclick="addSpotlight()"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" style="margin-right:6px;vertical-align:-1px"><line x1="8" y1="2" x2="8" y2="14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="2" y1="8" x2="14" y2="8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg> Tambah ke Spotlight</button>
+        </div>
+        <div class="admin-card">
+          <h3><svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="margin-right:6px;vertical-align:-3px"><rect x="2.5" y="1.5" width="11" height="13" rx="1.5" stroke="currentColor" stroke-width="1.4"/><line x1="5" y1="5.5" x2="11" y2="5.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><line x1="5" y1="8" x2="11" y2="8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><line x1="5" y1="10.5" x2="8.5" y2="10.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg> Daftar Spotlight</h3>
+          <div class="data-list" id="spotlightList"></div>
+        </div>
+      </div>
+
+      <!-- ── EVENTS ── -->
+      <div class="tab-content" id="content-events">
+        <div class="admin-topbar">
+          <div><h1><svg width="20" height="20" viewBox="0 0 16 16" fill="none" style="margin-right:8px;vertical-align:-4px"><rect x="1.5" y="2.5" width="13" height="12" rx="1.5" stroke="currentColor" stroke-width="1.4"/><line x1="1.5" y1="6.5" x2="14.5" y2="6.5" stroke="currentColor" stroke-width="1.4"/><line x1="5" y1="1" x2="5" y2="4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><line x1="11" y1="1" x2="11" y2="4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg> Kelola Events</h1><p>Tambah atau hapus event komunitas</p></div>
+        </div>
+        <div class="admin-card">
+          <h3><svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="margin-right:6px;vertical-align:-3px"><rect x="1.5" y="2.5" width="13" height="12" rx="1.5" stroke="currentColor" stroke-width="1.3"/><line x1="1.5" y1="6.5" x2="14.5" y2="6.5" stroke="currentColor" stroke-width="1.3"/><line x1="5" y1="1" x2="5" y2="4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><line x1="11" y1="1" x2="11" y2="4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><line x1="8" y1="9" x2="8" y2="13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="6" y1="11" x2="10" y2="11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg> Tambah Event Baru</h3>
+          <div class="form-row">
+            <div class="form-group"><label>Nama Event</label><input type="text" id="eTitle" placeholder="contoh: Design Sprint Bootcamp 2025"></div>
+            <div class="form-group">
+              <label>Tipe Event</label>
+              <select id="eType">
+                <option value="Workshop">Workshop</option>
+                <option value="Webinar">Webinar</option>
+                <option value="Kompetisi">Kompetisi</option>
+                <option value="Meetup">Meetup</option>
+                <option value="Lainnya">Lainnya</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row-3">
+            <div class="form-group"><label>Tanggal (angka)</label><input type="text" id="eDay" placeholder="contoh: 15"></div>
+            <div class="form-group"><label>Bulan (singkatan)</label><input type="text" id="eMonth" placeholder="contoh: Feb"></div>
+            <div class="form-group"><label>Jam</label><input type="text" id="eTime" placeholder="contoh: 09.00 – 17.00 WIB"></div>
+          </div>
+          <div class="form-group"><label>Deskripsi</label><textarea id="eDesc" placeholder="Deskripsi singkat tentang event ini..."></textarea></div>
+          <div class="form-row">
+            <div class="form-group"><label>Lokasi / Platform</label><input type="text" id="eLocation" placeholder="contoh: Zoom, Jakarta Selatan"></div>
+            <div class="form-group"><label>Info Slot / Pendaftaran</label><input type="text" id="eSlot" placeholder="contoh: 50 Slot tersisa"></div>
+          </div>
+          <button class="btn-add" onclick="addEvent()"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" style="margin-right:6px;vertical-align:-1px"><line x1="8" y1="2" x2="8" y2="14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="2" y1="8" x2="14" y2="8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg> Tambah Event</button>
+        </div>
+        <div class="admin-card">
+          <h3><svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="margin-right:6px;vertical-align:-3px"><rect x="2.5" y="1.5" width="11" height="13" rx="1.5" stroke="currentColor" stroke-width="1.4"/><line x1="5" y1="5.5" x2="11" y2="5.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><line x1="5" y1="8" x2="11" y2="8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><line x1="5" y1="10.5" x2="8.5" y2="10.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg> Daftar Events</h3>
+          <div class="data-list" id="eventList"></div>
+        </div>
+      </div>
+
+      <!-- ── INSTAGRAM ── -->
+      <div class="tab-content" id="content-instagram">
+        <div class="admin-topbar">
+          <div><h1><svg width="20" height="20" viewBox="0 0 16 16" fill="none" style="margin-right:8px;vertical-align:-4px"><rect x="1.5" y="4" width="13" height="10" rx="1.5" stroke="currentColor" stroke-width="1.4"/><circle cx="8" cy="9" r="2.5" stroke="currentColor" stroke-width="1.4"/><path d="M5.5 4l1-2h3l1 2" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><circle cx="12.5" cy="6.5" r="0.8" fill="currentColor"/></svg> Postingan Instagram</h1><p>Tambah embed postingan Instagram ke feed website</p></div>
+        </div>
+        <div class="admin-card">
+          <h3><svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="margin-right:6px;vertical-align:-3px"><rect x="1.5" y="4" width="13" height="10" rx="1.5" stroke="currentColor" stroke-width="1.3"/><circle cx="8" cy="9" r="2.5" stroke="currentColor" stroke-width="1.3"/><path d="M5.5 4l1-2h3l1 2" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><line x1="12" y1="1" x2="12" y2="5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="10" y1="3" x2="14" y2="3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg> Tambah Postingan</h3>
+          <div style="background:var(--blue-50);border-radius:10px;padding:14px;margin-bottom:16px;font-size:0.82rem;color:var(--text-mid);line-height:1.6;">
+            <strong>Cara mendapatkan Embed Link:</strong><br/>
+            1. Buka postingan di Instagram → klik ⋯ → pilih <strong>"Embed"</strong><br/>
+            2. Salin link yang ada di dalam <code>data-instgrm-permalink="..."</code><br/>
+            3. Tempel link tersebut di kolom di bawah
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>ID Pembuat (2 huruf)</label><input type="text" id="iId" placeholder="contoh: YG" maxlength="2" style="text-transform:uppercase"></div>
+            <div class="form-group"><label>Nama Pembuat</label><input type="text" id="iName" placeholder="contoh: Youthgraph Studio"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Tipe Konten</label><input type="text" id="iType" placeholder="contoh: Branding, UI/UX, Illustration"></div>
+            <div class="form-group"><label>Keterangan Singkat</label><input type="text" id="iDesc" placeholder="contoh: Branding concept untuk klien lokal"></div>
+          </div>
+          <div class="form-group"><label>Embed Permalink Instagram</label><input type="text" id="iEmbed" placeholder="https://www.instagram.com/p/XXXXX/?utm_source=ig_embed&utm_campaign=loading"></div>
+          <button class="btn-add" onclick="addInstaPost()"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" style="margin-right:6px;vertical-align:-1px"><line x1="8" y1="2" x2="8" y2="14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="2" y1="8" x2="14" y2="8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg> Tambah ke Feed</button>
+        </div>
+        <div class="admin-card">
+          <h3><svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="margin-right:6px;vertical-align:-3px"><rect x="2.5" y="1.5" width="11" height="13" rx="1.5" stroke="currentColor" stroke-width="1.4"/><line x1="5" y1="5.5" x2="11" y2="5.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><line x1="5" y1="8" x2="11" y2="8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><line x1="5" y1="10.5" x2="8.5" y2="10.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg> Daftar Postingan</h3>
+          <div class="data-list" id="instaList"></div>
+        </div>
+      </div>
+
+      <!-- ── PENGURUS ── -->
+      <div class="tab-content" id="content-pengurus">
+        <div class="admin-topbar">
+          <div><h1><svg width="20" height="20" viewBox="0 0 16 16" fill="none" style="margin-right:8px;vertical-align:-4px"><path d="M8 1L15 5H1L8 1z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><rect x="2.5" y="5" width="1.5" height="8" fill="currentColor" rx="0.5"/><rect x="7.25" y="5" width="1.5" height="8" fill="currentColor" rx="0.5"/><rect x="12" y="5" width="1.5" height="8" fill="currentColor" rx="0.5"/><rect x="1" y="13" width="14" height="1.5" rx="0.5" fill="currentColor"/></svg> Kelola Pengurus</h1><p>Tambah atau hapus tim pengurus komunitas</p></div>
+        </div>
+        <div class="admin-card">
+          <h3><svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="margin-right:6px;vertical-align:-3px"><circle cx="7" cy="6" r="3" stroke="currentColor" stroke-width="1.4"/><path d="M2 14c0-2.76 2.24-5 5-5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><line x1="12" y1="9" x2="12" y2="15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="9" y1="12" x2="15" y2="12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg> Tambah Pengurus Baru</h3>
+          <div class="form-row">
+            <div class="form-group"><label>ID (2 huruf kapital)</label><input type="text" id="pgId" placeholder="contoh: SS" maxlength="2" style="text-transform:uppercase"></div>
+            <div class="form-group"><label>Nama Lengkap</label><input type="text" id="pgName" placeholder="contoh: Surya Santosa"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Jabatan / Posisi</label><input type="text" id="pgPos" placeholder="contoh: Ketua Komunitas"></div>
+            <div class="form-group"><label>Username Instagram</label><input type="text" id="pgIg" placeholder="contoh: @suryasantosa_"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Username TikTok</label><input type="text" id="pgTt" placeholder="contoh: @username"></div>
+            <div class="form-group">
+              <label>Foto Avatar</label>
+              <div class="img-upload-area" onclick="document.getElementById('pgAvatarFile').click()" style="padding:10px;">
+                <input type="file" id="pgAvatarFile" accept="image/*" onchange="previewImg(this,'pgAvatarPreview','pgAvatarData')">
+                <img id="pgAvatarPreview" class="img-preview" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 80'%3E%3Ccircle cx='40' cy='40' r='40' fill='%23eef4ff'/%3E%3Ccircle cx='40' cy='30' r='14' fill='%237ab0ff'/%3E%3Cellipse cx='40' cy='65' rx='22' ry='16' fill='%237ab0ff'/%3E%3C/svg%3E" style="display:block;width:50px;height:50px;">
+                <div class="img-upload-label" style="font-size:0.7rem;">Upload foto</div>
+              </div>
+              <input type="hidden" id="pgAvatarData">
+            </div>
+          </div>
+          <button class="btn-add" onclick="addPengurus()"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" style="margin-right:6px;vertical-align:-1px"><line x1="8" y1="2" x2="8" y2="14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="2" y1="8" x2="14" y2="8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg> Tambah Pengurus</button>
+        </div>
+        <div class="admin-card">
+          <h3><svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="margin-right:6px;vertical-align:-3px"><rect x="2.5" y="1.5" width="11" height="13" rx="1.5" stroke="currentColor" stroke-width="1.4"/><line x1="5" y1="5.5" x2="11" y2="5.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><line x1="5" y1="8" x2="11" y2="8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><line x1="5" y1="10.5" x2="8.5" y2="10.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg> Daftar Pengurus</h3>
+          <div class="data-list" id="pengurusList"></div>
+        </div>
+      </div>
+
+      <!-- ── SETTINGS ── -->
+      <div class="tab-content" id="content-settings">
+        <div class="admin-topbar">
+          <div><h1><svg width="20" height="20" viewBox="0 0 16 16" fill="none" style="margin-right:8px;vertical-align:-4px"><circle cx="8" cy="8" r="2.2" stroke="currentColor" stroke-width="1.4"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3.05 3.05l1.41 1.41M11.54 11.54l1.41 1.41M3.05 12.95l1.41-1.41M11.54 4.46l1.41-1.41" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg> Pengaturan</h1><p>Kelola akun dan password admin</p></div>
+        </div>
+        <div class="admin-card">
+          <h3><svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="margin-right:6px;vertical-align:-3px"><rect x="3" y="7" width="10" height="8" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M5 7V5a3 3 0 016 0v2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><circle cx="8" cy="11" r="1.2" fill="currentColor"/></svg> Kelola Akun Admin</h3>
+          <p style="font-size:0.85rem;color:var(--text-mid);margin-bottom:16px;">Tambah atau hapus akun pengurus yang bisa mengakses panel ini.</p>
+          <div class="form-row">
+            <div class="form-group"><label>Username Baru</label><input type="text" id="newUser" placeholder="contoh: pengurus2"></div>
+            <div class="form-group"><label>Password Baru</label><input type="password" id="newPass" placeholder="Minimal 6 karakter"></div>
+          </div>
+          <button class="btn-add" onclick="addAdmin()"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" style="margin-right:6px;vertical-align:-1px"><line x1="8" y1="2" x2="8" y2="14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="2" y1="8" x2="14" y2="8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg> Tambah Akun Admin</button>
+          <div class="data-list" id="adminList" style="margin-top:16px;"></div>
+        </div>
+        <div class="admin-card">
+          <h3><svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="margin-right:6px;vertical-align:-3px"><polyline points="2,4 14,4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M5 4V2.5A0.5 0.5 0 015.5 2h5a0.5 0.5 0 01.5.5V4" stroke="currentColor" stroke-width="1.3"/><path d="M3 4l1 10.5A0.5 0.5 0 004.5 15h7a0.5 0.5 0 00.5-.5L13 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><line x1="6.5" y1="7" x2="6.5" y2="12" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><line x1="9.5" y1="7" x2="9.5" y2="12" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg> Reset Data</h3>
+          <p style="font-size:0.85rem;color:var(--text-mid);margin-bottom:16px;">Hati-hati! Reset akan mengembalikan semua data ke pengaturan awal dari kode website.</p>
+          <button onclick="resetData()" style="padding:10px 20px;background:var(--red-light);color:var(--red);font-family:'Plus Jakarta Sans',sans-serif;font-size:0.85rem;font-weight:700;border:1px solid rgba(229,62,62,0.3);border-radius:10px;cursor:pointer;"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" style="margin-right:6px;vertical-align:-2px"><polyline points="2,4 14,4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M5 4V2.5A0.5 0.5 0 015.5 2h5a0.5 0.5 0 01.5.5V4" stroke="currentColor" stroke-width="1.3"/><path d="M3 4l1 10.5A0.5 0.5 0 004.5 15h7a0.5 0.5 0 00.5-.5L13 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><line x1="6.5" y1="7" x2="6.5" y2="12" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><line x1="9.5" y1="7" x2="9.5" y2="12" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+            Reset Semua Data ke Default
+          </button>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- Toast Container -->
+<div id="toastContainer"></div>
+
+
+<script src="admin.js"></script>
+</body>
+</html>

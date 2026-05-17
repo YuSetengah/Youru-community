@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>YOURU Creative Community</title>
+  <link rel="icon" href="asset/youru.png">
+  <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300;1,9..40,400&display=swap" rel="stylesheet" />
+  
+  <link rel="stylesheet" href="style.css">
+  <script>
+    (function(){
+      if(localStorage.getItem('youru_theme')==='dark')
+        document.documentElement.setAttribute('data-theme','dark');
+    })();
+  </script>
+
+  <style>
+    /* ══════════════════════════════════════
+       INSTAGRAM GRID HOVER EFFECT
+    ══════════════════════════════════════ */
+    .insta-card {
+      position: relative;
+      overflow: hidden;
+      border-radius: 16px;
+    }
+
+    .insta-card .insta-hover-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.55);
+      backdrop-filter: blur(2px);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    .insta-card:hover .insta-hover-overlay {
+      opacity: 1;
+    }
+
+    .insta-hover-overlay .view-label {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      color: #fff;
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 0.95rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      transform: translateY(10px);
+      transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .insta-card:hover .insta-hover-overlay .view-label {
+      transform: translateY(0);
+    }
+
+    .view-label svg {
+      width: 32px; height: 32px;
+      stroke: #fff;
+      stroke-width: 1.5;
+      fill: none;
+    }
+
+    /* Zoom image on hover — applies to blockquote container */
+    .insta-card > blockquote,
+    .insta-card > .insta-img {
+      transition: transform 0.42s cubic-bezier(0.4, 0, 0.2, 1);
+      transform-origin: center;
+    }
+
+    .insta-card:hover > blockquote,
+    .insta-card:hover > .insta-img {
+      transform: scale(1.04);
+    }
+
+    /* ══════════════════════════════════════
+       GSAP ANIMATION INITIAL STATES
+    ══════════════════════════════════════ */
+    .member-card.gsap-member {
+      opacity: 0;
+      transform: translateY(40px);
+    }
+
+    .spotlight-card.gsap-spotlight {
+      opacity: 0;
+      transform: scale(0.88);
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">
+    <div class="logo-dot"></div>
+    <span>YOURU</span> Community
+  </div>
+
+  <button class="mobile-toggle" id="navHamburger" onclick="toggleMenu()" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+
+  <ul class="nav-links" id="navMenu">
+    <li><a href="javascript:void(0)" id="nav-home" class="active" onclick="showPage('home')">Home</a></li>
+    <li><a href="javascript:void(0)" id="nav-about" onclick="showPage('about')">About</a></li>
+    <li><a href="javascript:void(0)" onclick="scrollToSection('members')">Members</a></li>
+    <li><a href="javascript:void(0)" onclick="scrollToSection('events')">Events</a></li>
+    <li><a href="admin.html">Admin</a></li>
+    <li class="nav-darkmode-mobile-item">
+      <button class="nav-darkmode-mobile" onclick="toggleDarkMode()" aria-label="Toggle dark mode">
+        <span id="darkIconMobileLabel">Dark Mode</span>
+      </button>
+    </li>
+  </ul>
+  <button class="nav-darkmode" id="navDarkBtn" onclick="toggleDarkMode()" aria-label="Toggle dark mode">
+    <svg id="darkIcon" width="22" height="22" viewBox="0 0 16 16" fill="none"><path d="M13.5 10.5A6 6 0 015.5 2.5a6 6 0 108 8z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+  </button>
+</nav>
+
+<!-- ══════════ HOME PAGE ══════════ -->
+<div id="page-home" class="page active">
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-glass-grid"></div>
+    <div class="hero-badge"><svg width="10" height="10" viewBox="0 0 10 10" fill="none" style="margin-right:5px;vertical-align:-1px"><path d="M5 0.5L6.2 3.8L9.7 4.5L7.2 7L7.8 10.5L5 8.8L2.2 10.5L2.8 7L0.3 4.5L3.8 3.8Z" stroke="currentColor" stroke-width="1" stroke-linejoin="round"/></svg> Komunitas Kreatif Indonesia</div>
+    <h1>Ruang Tumbuh<br/>Para <em>Kreator</em></h1>
+    <p>NARA adalah komunitas kreatif yang mewadahi para desainer, ilustrator, dan seniman digital untuk berkolaborasi, berbagi karya, dan berkembang bersama.</p>
+    <div class="hero-btns">
+      <button class="btn-primary" onclick="scrollToSection('feed')">Lihat Karya</button>
+      <button class="btn-outline" onclick="showPage('about')">Tentang Kami</button>
+    </div>
+    <div class="hero-stats">
+      <div class="stat"><div class="stat-number" id="heroStatMembers">120+</div><div class="stat-label" id="heroLabelMembers">Member Aktif</div></div>
+      <div class="stat"><div class="stat-number" id="heroStatKarya">48</div><div class="stat-label" id="heroLabelKarya">Karya Bulan Ini</div></div>
+      <div class="stat"><div class="stat-number" id="heroStatEvent">12</div><div class="stat-label" id="heroLabelEvent">Event Tahunan</div></div>
+    </div>
+  </section>
+
+  <!-- Instagram Feed -->
+  <section class="section" id="feed">
+    <div class="section-header reveal">
+      <div class="section-tag"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="margin-right:5px;vertical-align:-2px"><rect x="1.5" y="4" width="13" height="10" rx="1.5" stroke="currentColor" stroke-width="1.4"/><circle cx="8" cy="9" r="2.5" stroke="currentColor" stroke-width="1.4"/><path d="M5.5 4l1-2h3l1 2" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><circle cx="12.5" cy="6.5" r="0.8" fill="currentColor"/></svg> Feed Instagram</div>
+      <h2 class="section-title">Karya Terkini dari<br/>Komunitas NARA</h2>
+      <p class="section-sub">Desain-desain terbaru dari para member, diambil langsung dari akun Instagram komunitas kami.</p>
+    </div>
+    <div class="insta-grid" id="instaGrid"></div>
+    <div class="insta-banner reveal">
+      <p><svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="margin-right:5px;vertical-align:-2px"><rect x="2" y="2" width="12" height="12" rx="3" stroke="currentColor" stroke-width="1.4"/><circle cx="8" cy="8" r="3" stroke="currentColor" stroke-width="1.3"/><circle cx="11.5" cy="4.5" r="0.8" fill="currentColor"/></svg> Ikuti kami di Instagram dan tiktok untuk karya terbaru setiap hari!</p>
+      <a href="https://www.instagram.com/youru.studio?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" target="_blank">@youru.studio →</a>
+      <a href="https://www.tiktok.com/@nara_unit" target="_blank">@nara_unit →</a>
+    </div>
+  </section>
+
+  <hr class="divider" />
+
+  <!-- Member Spotlight -->
+  <section class="section section-alt">
+    <div class="section-header reveal">
+      <div class="section-tag"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="margin-right:5px;vertical-align:-2px"><path d="M8 1l1.85 3.75L14 5.5l-3 2.92.71 4.13L8 10.4l-3.71 2.15L5 8.42 2 5.5l4.15-.75L8 1z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg> Spotlight</div>
+      <h2 class="section-title">Kreator yang Sedang<br/>Bersinar</h2>
+      <p class="section-sub">Member dengan karya dan kontribusi terbaik bulan ini.</p>
+    </div>
+    <div class="spotlight-grid" id="spotlightGrid"></div>
+  </section>
+
+  <hr class="divider" />
+
+  <!-- Members -->
+  <section class="section" id="members">
+    <div class="section-header reveal">
+      <div class="section-tag"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="margin-right:5px;vertical-align:-2px"><circle cx="6" cy="5" r="2.5" stroke="currentColor" stroke-width="1.5"/><path d="M1 14c0-2.76 2.24-5 5-5s5 2.24 5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="12" cy="5" r="2" stroke="currentColor" stroke-width="1.3"/><path d="M14 13c0-2-1.34-3.7-3.2-4.2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg> Member</div>
+      <h2 class="section-title">Keluarga NARA Community</h2>
+      <p class="section-sub">Bergabunglah bersama 120+ kreator berbakat dari seluruh Indonesia.</p>
+    </div>
+    <div class="member-grid" id="memberGrid"></div>
+  </section>
+
+  <hr class="divider" />
+
+  <!-- Pengurus -->
+  <section class="section section-alt">
+    <div class="section-header reveal">
+      <div class="section-tag"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="margin-right:5px;vertical-align:-2px"><path d="M8 1L15 5H1L8 1z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><rect x="2.5" y="5" width="1.5" height="8" fill="currentColor" rx="0.5"/><rect x="7.25" y="5" width="1.5" height="8" fill="currentColor" rx="0.5"/><rect x="12" y="5" width="1.5" height="8" fill="currentColor" rx="0.5"/><rect x="1" y="13" width="14" height="1.5" rx="0.5" fill="currentColor"/></svg> Pengurus</div>
+      <h2 class="section-title">Tim Pengurus NARA</h2>
+      <p class="section-sub">Mereka yang mengelola dan menggerakkan komunitas ini.</p>
+    </div>
+    <div class="board-grid" id="boardGrid"></div>
+  </section>
+
+  <hr class="divider" />
+
+  <!-- Events -->
+  <section class="section" id="events">
+    <div class="section-header reveal">
+      <div class="section-tag"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="margin-right:5px;vertical-align:-2px"><rect x="1.5" y="2.5" width="13" height="12" rx="1.5" stroke="currentColor" stroke-width="1.4"/><line x1="1.5" y1="6.5" x2="14.5" y2="6.5" stroke="currentColor" stroke-width="1.4"/><line x1="5" y1="1" x2="5" y2="4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><line x1="11" y1="1" x2="11" y2="4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg> Events</div>
+      <h2 class="section-title">Event yang Akan Datang</h2>
+      <p class="section-sub">Jangan lewatkan program dan kegiatan seru dari komunitas NARA.</p>
+    </div>
+    <div class="events-list" id="eventsList"></div>
+  </section>
+
+</div>
+
+<!-- ══════════ ABOUT PAGE ══════════ -->
+<div id="page-about" class="page">
+  <div class="about-hero">
+    <div class="section-tag" style="background:rgba(255,255,255,0.12);color:var(--blue-100);">Tentang Kami</div>
+    <h1>Mengenal NARA<br/>Creative Community</h1>
+    <p>Sebuah ruang aman bagi para kreator untuk tumbuh, berkolaborasi, dan menginspirasi satu sama lain.</p>
+  </div>
+
+  <div class="about-content">
+    <div class="about-card reveal">
+      <div class="about-card-title"><div class="icon"><svg width="20" height="20" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.4"/><path d="M5 11c0-1.66 1.34-3 3-3s3 1.34 3 3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><circle cx="5.5" cy="6.5" r="1" fill="currentColor"/><circle cx="10.5" cy="6.5" r="1" fill="currentColor"/></svg></div> Apa itu NARA Community?</div>
+      <p>
+        NARA Creative Community adalah komunitas desainer, ilustrator, dan kreator digital yang didirikan atas dasar semangat berbagi dan tumbuh bersama. Nama "NARA" berasal dari kata dalam bahasa Jawa yang berarti "manusia" — mencerminkan bahwa komunitas ini dibangun oleh dan untuk manusia kreatif.
+      </p>
+      <p style="margin-top:10px;">
+        Kami percaya bahwa kreativitas tumbuh paling baik ketika dirayakan bersama. Di NARA, setiap karya dihargai, setiap ide disambut, dan setiap kreator punya tempat untuk berkembang.
+      </p>
+    </div>
+
+    <div class="about-card reveal">
+      <div class="about-card-title"><div class="icon"><svg width="20" height="20" viewBox="0 0 16 16" fill="none"><path d="M8 13V3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M2 3.5C4 3 6 3.5 8 4.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M14 3.5C12 3 10 3.5 8 4.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M2 13C4 12.5 6 13 8 14" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M14 13C12 12.5 10 13 8 14" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M2 3.5v9.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M14 3.5v9.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></div> Sejarah Berdiri</div>
+      <div class="timeline">
+        <div class="tl-item">
+          <div class="tl-line"><div class="tl-dot"></div><div class="tl-track"></div></div>
+          <div class="tl-body"><div class="tl-year">2021 — Lahirnya Ide</div><div class="tl-desc">Sekelompok desainer muda berkumpul secara informal, berbagi portofolio dan pengalaman melalui grup WhatsApp sederhana.</div></div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-line"><div class="tl-dot"></div><div class="tl-track"></div></div>
+          <div class="tl-body"><div class="tl-year">2022 — Komunitas Resmi</div><div class="tl-desc">NARA resmi berdiri pada 14 Februari 2022 dengan 24 anggota pendiri. Platform Instagram diluncurkan sebagai ruang pamer karya.</div></div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-line"><div class="tl-dot"></div><div class="tl-track"></div></div>
+          <div class="tl-body"><div class="tl-year">2023 — Berkembang Pesat</div><div class="tl-desc">Anggota bertumbuh menjadi 80+ orang. Event pertama "NARA Design Week" sukses diselenggarakan secara hybrid.</div></div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-line"><div class="tl-dot"></div></div>
+          <div class="tl-body"><div class="tl-year">2024–Sekarang — Era Baru</div><div class="tl-desc">Lebih dari 120 member aktif, program mentorship, dan kolaborasi dengan brand lokal. NARA terus berkembang.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="about-card reveal">
+      <div class="about-card-title"><div class="icon"><svg width="20" height="20" viewBox="0 0 16 16" fill="none"><path d="M8 1l1.85 3.75L14 5.5l-3 2.92.71 4.13L8 10.4l-3.71 2.15L5 8.42 2 5.5l4.15-.75L8 1z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg></div> Visi & Misi</div>
+      <div class="vm-grid">
+        <div class="vm-box">
+          <h4><svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="margin-right:5px;vertical-align:-2px"><circle cx="8" cy="8" r="4" stroke="currentColor" stroke-width="1.4"/><circle cx="8" cy="8" r="1.5" fill="currentColor"/><line x1="8" y1="1" x2="8" y2="3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><line x1="8" y1="13" x2="8" y2="15" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><line x1="1" y1="8" x2="3" y2="8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><line x1="13" y1="8" x2="15" y2="8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg> Visi</h4>
+          <ul>
+            <li>Menjadi komunitas kreatif paling inklusif dan inspiratif di Indonesia</li>
+            <li>Melahirkan generasi kreator yang kompeten dan berkarakter</li>
+            <li>Mendorong ekosistem desain lokal yang kuat dan berdaya saing global</li>
+          </ul>
+        </div>
+        <div class="vm-box">
+          <h4><svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="margin-right:5px;vertical-align:-2px"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.4"/><circle cx="8" cy="8" r="3.5" stroke="currentColor" stroke-width="1.2"/><circle cx="8" cy="8" r="1.2" fill="currentColor"/></svg> Misi</h4>
+          <ul>
+            <li>Menyediakan ruang aman untuk berbagi karya dan mendapat umpan balik</li>
+            <li>Menyelenggarakan workshop, webinar, dan event kreatif berkala</li>
+            <li>Memfasilitasi kolaborasi antar member dan dengan industri</li>
+            <li>Membangun jaringan kreator yang saling mendukung dan menginspirasi</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="about-card reveal">
+      <div class="about-card-title"><div class="icon"><svg width="20" height="20" viewBox="0 0 16 16" fill="none"><path d="M8 1a5 5 0 013.54 8.54C11 10 10.5 10.5 10.5 11.5H5.5C5.5 10.5 5 10 4.46 9.54A5 5 0 018 1z" stroke="currentColor" stroke-width="1.4"/><line x1="5.5" y1="11.5" x2="10.5" y2="11.5" stroke="currentColor" stroke-width="1.3"/><line x1="6" y1="13" x2="10" y2="13" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><line x1="7" y1="14.5" x2="9" y2="14.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></div> Nilai-Nilai Kami</div>
+      <p>Komunitas NARA dibangun di atas tiga pilar utama:</p>
+      <div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:16px;">
+        <div style="flex:1;min-width:160px;background:var(--blue-50);border-radius:12px;padding:16px;border-left:4px solid var(--blue-500);">
+          <div style="font-weight:700;color:var(--navy);margin-bottom:6px;display:flex;align-items:center;gap:6px;"><svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M10.5 6C10.5 7.38 9.38 8.5 8 8.5S5.5 7.38 5.5 6 6.62 3.5 8 3.5s2.5 1.12 2.5 2.5z" stroke="var(--blue-500)" stroke-width="1.3"/><path d="M3 14c0-2.76 2.24-5 5-5s5 2.24 5 5" stroke="var(--blue-500)" stroke-width="1.3" stroke-linecap="round"/><path d="M13 4.5a2 2 0 010 3.5" stroke="var(--blue-500)" stroke-width="1.2" stroke-linecap="round"/><path d="M15 13c0-1.5-1-2.8-2.5-3.2" stroke="var(--blue-500)" stroke-width="1.2" stroke-linecap="round"/></svg> Kolaborasi</div>
+          <div style="font-size:0.83rem;color:var(--text-mid);line-height:1.6;">Kami tumbuh bersama, bukan bersaing satu sama lain.</div>
+        </div>
+        <div style="flex:1;min-width:160px;background:var(--blue-50);border-radius:12px;padding:16px;border-left:4px solid var(--blue-500);">
+          <div style="font-weight:700;color:var(--navy);margin-bottom:6px;display:flex;align-items:center;gap:6px;"><svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M8 1l1.2 4.8L14 8l-4.8 2.2L8 15l-1.2-4.8L2 8l4.8-2z" stroke="var(--blue-500)" stroke-width="1.3" stroke-linejoin="round"/></svg> Kreativitas</div>
+          <div style="font-size:0.83rem;color:var(--text-mid);line-height:1.6;">Setiap ide dihargai, setiap karya diperlakukan dengan hormat.</div>
+        </div>
+        <div style="flex:1;min-width:160px;background:var(--blue-50);border-radius:12px;padding:16px;border-left:4px solid var(--blue-500);">
+          <div style="font-weight:700;color:var(--navy);margin-bottom:6px;display:flex;align-items:center;gap:6px;"><svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M8 14V8" stroke="var(--blue-500)" stroke-width="1.3" stroke-linecap="round"/><path d="M8 8C8 5 10 3 13 3c0 3-2 5-5 5z" stroke="var(--blue-500)" stroke-width="1.3" stroke-linejoin="round"/><path d="M8 10C8 7.5 6 6 3 6c0 2.5 2 4.5 5 4z" stroke="var(--blue-500)" stroke-width="1.3" stroke-linejoin="round"/></svg> Pertumbuhan</div>
+          <div style="font-size:0.83rem;color:var(--text-mid);line-height:1.6;">Kami terus belajar dan berkembang, satu langkah setiap hari.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">NARA Community</div>
+  <p>© 2024 NARA Creative Community. Dibuat dengan <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="margin:0 2px;vertical-align:-1px"><path d="M8 13.7C7.2 13 1 9 1 5a4 4 0 017-2.6A4 4 0 0115 5c0 4-6.2 8-7 8.7z" fill="#e53e3e" stroke="#e53e3e" stroke-width="0.5"/></svg> oleh Tim NARA.</p>
+  <div class="footer-links">
+    <a href="https://www.instagram.com/youru.studio?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" target="_blank">Instagram</a>
+    <a href="https://www.tiktok.com/@nara_unit" target="_blank">Tiktok</a>
+    <a href="https://chat.whatsapp.com/KfXycLj8gjq4l5nEpDReyc" target="_blank">WhatsApp Group</a>
+    <a href="https://open.spotify.com/playlist/7eB643a4QB4gff4x6d0UJE?si=1dde55b0c64a4a23" target="_blank">Spotify Playlist</a>
+  </div>
+</footer>
+
+<script src="index.js"></script>
+<script async src="//www.instagram.com/embed.js"></script>
+
+<!-- ══════════════════════════════════════
+     GSAP + ScrollTrigger
+══════════════════════════════════════ -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ══════════════════════════════════════
+     1. INSTAGRAM HOVER OVERLAY INJECTION
+     — injected after index.js renders the grid
+  ══════════════════════════════════════ */
+  function injectInstaOverlays() {
+    const cards = document.querySelectorAll('#instaGrid .insta-card');
+    cards.forEach(card => {
+      if (card.querySelector('.insta-hover-overlay')) return; // idempotent
+      const overlay = document.createElement('div');
+      overlay.className = 'insta-hover-overlay';
+      overlay.innerHTML = `
+        <div class="view-label">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/></svg>
+          View
+        </div>`;
+      card.appendChild(overlay);
+    });
+  }
+
+  /* ══════════════════════════════════════
+     3. GSAP SCROLL ANIMATIONS
+  ══════════════════════════════════════ */
+  gsap.registerPlugin(ScrollTrigger);
+
+  function initGsapAnimations() {
+    // ── Member Grid: fade + slide up (staggered) ──
+    const memberCards = document.querySelectorAll('#memberGrid .member-card');
+    if (memberCards.length) {
+      memberCards.forEach(c => c.classList.add('gsap-member'));
+
+      gsap.to('#memberGrid .gsap-member', {
+        opacity: 1,
+        y: 0,
+        duration: 0.65,
+        ease: 'power3.out',
+        stagger: 0.08,
+        scrollTrigger: {
+          trigger: '#memberGrid',
+          start: 'top 82%',
+          toggleActions: 'play none none none',
+        }
+      });
+    }
+
+    // ── Spotlight Grid: scale pop-up (staggered) ──
+    const spotCards = document.querySelectorAll('#spotlightGrid .spotlight-card');
+    if (spotCards.length) {
+      spotCards.forEach(c => c.classList.add('gsap-spotlight'));
+
+      gsap.to('#spotlightGrid .gsap-spotlight', {
+        opacity: 1,
+        scale: 1,
+        duration: 0.6,
+        ease: 'back.out(1.5)',
+        stagger: 0.1,
+        scrollTrigger: {
+          trigger: '#spotlightGrid',
+          start: 'top 82%',
+          toggleActions: 'play none none none',
+        }
+      });
+    }
+  }
+
+  /* ══════════════════════════════════════
+     4. OBSERVER: wait for index.js renders
+  ══════════════════════════════════════ */
+  function waitForGrids() {
+    // Polls until both grids have children (index.js fills them on DOMContentLoaded)
+    const memberGrid    = document.getElementById('memberGrid');
+    const spotlightGrid = document.getElementById('spotlightGrid');
+    const instaGrid     = document.getElementById('instaGrid');
+
+    const allReady = () =>
+      memberGrid    && memberGrid.children.length > 0 &&
+      spotlightGrid && spotlightGrid.children.length > 0;
+
+    if (allReady()) {
+      injectInstaOverlays();
+      initGsapAnimations();
+      return;
+    }
+
+    // Use MutationObserver on memberGrid as primary signal
+    let resolved = false;
+    const observer = new MutationObserver(() => {
+      if (resolved || !allReady()) return;
+      resolved = true;
+      observer.disconnect();
+      injectInstaOverlays();
+      initGsapAnimations();
+    });
+
+    if (memberGrid)    observer.observe(memberGrid,    { childList: true });
+    if (spotlightGrid) observer.observe(spotlightGrid, { childList: true });
+    if (instaGrid)     observer.observe(instaGrid,     { childList: true });
+
+    // Fallback timeout
+    setTimeout(() => {
+      if (resolved) return;
+      resolved = true;
+      observer.disconnect();
+      injectInstaOverlays();
+      initGsapAnimations();
+    }, 2000);
+  }
+
+  // Run after DOM + index.js have executed
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', waitForGrids);
+  } else {
+    waitForGrids();
+  }
+
+})();
+</script>
+
+</body>
+</html>
